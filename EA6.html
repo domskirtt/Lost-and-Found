@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Lost &amp; Found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+  *{margin:0; padding:0; box-sizing:border-box;}
+
+  body{
+    font-family:'Inter', Arial, sans-serif;
+    background:#F4F6F8;
+    color:#1F2937;
+    padding:40px 20px 60px;
+  }
+
+  .page{
+    max-width:920px;
+    margin:0 auto;
+  }
+
+  h1{
+    font-size:24px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:4px;
+  }
+
+  .subtitle{
+    font-size:14px;
+    color:#6B7280;
+    margin-bottom:28px;
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:360px 1fr;
+    gap:24px;
+    align-items:start;
+  }
+
+  @media (max-width:760px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  .card{
+    background:#ffffff;
+    border-radius:12px;
+    padding:24px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.06);
+  }
+
+  .card h2{
+    font-size:16px;
+    font-weight:600;
+    color:#111827;
+    margin-bottom:16px;
+  }
+
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:500;
+    color:#4B5563;
+    margin-bottom:6px;
+  }
+
+  .field{margin-bottom:14px;}
+
+  input[type=text], input[type=email], input[type=date], select, textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #D1D5DB;
+    border-radius:8px;
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    color:#1F2937;
+    background:#fff;
+  }
+
+  textarea{resize:vertical; min-height:64px;}
+
+  input:focus, select:focus, textarea:focus{
+    outline:none;
+    border-color:#0F766E;
+    box-shadow:0 0 0 3px rgba(15,118,110,0.15);
+  }
+
+  .status-toggle{
+    display:flex;
+    gap:8px;
+  }
+
+  .status-btn{
+    flex:1;
+    padding:9px 0;
+    text-align:center;
+    border-radius:8px;
+    border:1px solid #D1D5DB;
+    background:#fff;
+    font-size:13px;
+    font-weight:500;
+    color:#4B5563;
+    cursor:pointer;
+  }
+
+  .status-btn[aria-pressed="true"][data-status="Lost"]{
+    background:#FEE2E2;
+    border-color:#DC2626;
+    color:#B91C1C;
+  }
+
+  .status-btn[aria-pressed="true"][data-status="Found"]{
+    background:#DCFCE7;
+    border-color:#16A34A;
+    color:#15803D;
+  }
+
+  .field-error{
+    font-size:11.5px;
+    color:#DC2626;
+    margin-top:5px;
+    display:none;
+  }
+
+  button.submit-btn{
+    width:100%;
+    padding:12px;
+    margin-top:6px;
+    border:none;
+    border-radius:8px;
+    background:#0F766E;
+    color:#fff;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+
+  button.submit-btn:hover{background:#0B5C56;}
+
+  .advice{
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:8px;
+    font-size:12.5px;
+    line-height:1.5;
+    background:#F0FDF4;
+    color:#166534;
+    display:none;
+  }
+  .advice.show{display:block;}
+  .advice.warn{
+    background:#FEF2F2;
+    color:#991B1B;
+  }
+
+  /* ---------- BOARD ---------- */
+  .board-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+
+  .filter-group{display:flex; gap:6px;}
+
+  .filter-btn{
+    background:#fff;
+    border:1px solid #D1D5DB;
+    color:#4B5563;
+    font-size:12.5px;
+    padding:6px 12px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .filter-btn[aria-pressed="true"]{
+    background:#0F766E;
+    color:#fff;
+    border-color:#0F766E;
+  }
+
+  .stats{
+    display:flex;
+    gap:10px;
+    margin-bottom:14px;
+  }
+
+  .stat-pill{
+    background:#fff;
+    border-radius:8px;
+    padding:10px 16px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+    font-size:12px;
+    color:#6B7280;
+  }
+  .stat-pill b{
+    display:block;
+    font-size:18px;
+    color:#111827;
+  }
+
+  .report-list{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .report{
+    background:#fff;
+    border-radius:10px;
+    padding:14px 16px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    gap:14px;
+    align-items:center;
+    border-left:4px solid #9CA3AF;
+  }
+  .report[data-status="Lost"]{border-left-color:#DC2626;}
+  .report[data-status="Found"]{border-left-color:#16A34A;}
+
+  .status-tag{
+    font-size:11px;
+    font-weight:600;
+    padding:4px 10px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .report[data-status="Lost"] .status-tag{background:#FEE2E2; color:#B91C1C;}
+  .report[data-status="Found"] .status-tag{background:#DCFCE7; color:#15803D;}
+
+  .report-body{min-width:0;}
+  .report-title{font-weight:600; font-size:14px; color:#111827;}
+  .report-meta{font-size:12px; color:#6B7280; margin-top:2px;}
+
+  .remove-btn{
+    background:transparent;
+    border:none;
+    color:#9CA3AF;
+    cursor:pointer;
+    font-size:16px;
+  }
+  .remove-btn:hover{color:#DC2626;}
+
+  .empty-state{
+    text-align:center;
+    padding:40px 20px;
+    color:#9CA3AF;
+    font-size:13px;
+    background:#fff;
+    border-radius:10px;
+    border:1px dashed #D1D5DB;
+  }
+
+  #toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:#111827;
+    color:#fff;
+    padding:11px 18px;
+    border-radius:8px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <h1>Campus Lost &amp; Found</h1>
+  <p class="subtitle">Report a lost or found item. Every report is recorded to the shared Lost &amp; Found sheet.</p>
+
+  <div class="layout">
+
+    <!-- FORM -->
+    <div class="card">
+      <h2>New report</h2>
+
+      <form id="report-form" novalidate>
+
+        <div class="field">
+          <label>Report type</label>
+          <div class="status-toggle" id="status-toggle">
+            <button type="button" class="status-btn" data-status="Lost" aria-pressed="true">I lost something</button>
+            <button type="button" class="status-btn" data-status="Found" aria-pressed="false">I found something</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="reporter-name">Your name *</label>
+          <input type="text" id="reporter-name" placeholder="e.g. Dominic Reyes">
+          <p class="field-error" id="err-name">Enter your name.</p>
+        </div>
+
+        <div class="field">
+          <label for="reporter-email">Email *</label>
+          <input type="email" id="reporter-email" placeholder="you@school.edu">
+          <p class="field-error" id="err-email">Enter a valid email.</p>
+        </div>
+
+        <div class="field">
+          <label for="item-type">Item category</label>
+          <select id="item-type">
+            <option>Electronics</option>
+            <option>Bag</option>
+            <option>ID / Documents</option>
+            <option>Accessories</option>
+            <option>Book / Notes</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="item-desc">Description *</label>
+          <textarea id="item-desc" placeholder="Color, brand, distinguishing details..."></textarea>
+          <p class="field-error" id="err-desc">Add a short description.</p>
+        </div>
+
+        <div class="field">
+          <label for="item-location">Location *</label>
+          <input type="text" id="item-location" placeholder="e.g. Library, 2nd floor">
+          <p class="field-error" id="err-location">Enter a location.</p>
+        </div>
+
+        <div class="field">
+          <label for="item-date">Date *</label>
+          <input type="date" id="item-date">
+          <p class="field-error" id="err-date">Pick a date.</p>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">Submit report</button>
+
+        <div class="advice" id="advice"></div>
+
+      </form>
+    </div>
+
+    <!-- BOARD -->
+    <div>
+      <div class="stats">
+        <div class="stat-pill"><b id="stat-total">0</b>Total reports</div>
+        <div class="stat-pill"><b id="stat-lost">0</b>Lost</div>
+        <div class="stat-pill"><b id="stat-found">0</b>Found</div>
+      </div>
+
+      <div class="board-head">
+        <h2 style="font-size:15px; color:#111827;">Recent reports</h2>
+        <div class="filter-group" id="filter-group">
+          <button class="filter-btn" data-filter="All" aria-pressed="true">All</button>
+          <button class="filter-btn" data-filter="Lost" aria-pressed="false">Lost</button>
+          <button class="filter-btn" data-filter="Found" aria-pressed="false">Found</button>
+        </div>
+      </div>
+
+      <ul class="report-list" id="report-list"></ul>
+      <p class="empty-state" id="empty-state">No reports yet. Be the first to log one.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+
+  
+  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlTd859PMtGau1W2St95mPYrXemzRbfWJliVYCMApf7YatYGT2rqXWfcQhYsvjNyk/exec";
+
+
+  var reports = [];
+  var nextId = 1;
+  var selectedStatus = "Lost";
+  var activeFilter = "All";
+
+  
+  var form          = document.getElementById("report-form");
+  var reportList     = document.getElementById("report-list");
+  var emptyState     = document.getElementById("empty-state");
+  var toast         = document.getElementById("toast");
+  var submitBtn      = document.getElementById("submit-btn");
+  var adviceBox      = document.getElementById("advice");
+
+  
+  var statusToggle   = document.querySelector("#status-toggle");
+  var statusButtons  = document.querySelectorAll(".status-btn");
+  var filterButtons  = document.querySelectorAll("#filter-group .filter-btn");
+
+  
+  var statPills      = document.getElementsByClassName("stat-pill");
+  var formFields      = form.getElementsByTagName("input");
+
+  
+
+  function generateId(){
+    var id = nextId;
+    while (reports.some(function(r){ return r.id === id; })) {
+      id++;
+    }
+    nextId = id + 1;
+    return id;
+  }
+
+  function showToast(message, isError){
+    toast.textContent = message;
+    toast.style.background = isError ? "#991B1B" : "#111827";
+    toast.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+  }
+
+  
+  function buildAdvice(status, type){
+    if (status === "Found" && type === "Electronics") {
+      return { text: "High-value item — hand it to the campus security office instead of holding onto it.", warn: true };
+    } else if (status === "Found" && type === "ID / Documents") {
+      return { text: "IDs and documents should be turned in to the registrar so the owner can be verified.", warn: true };
+    } else if (status === "Lost" && type === "Electronics") {
+      return { text: "Check with campus security first — found electronics are usually handed in there directly.", warn: false };
+    } else if (status === "Lost") {
+      return { text: "Your report has been logged. Check back here if someone reports finding a matching item.", warn: false };
+    } else {
+      return { text: "Thanks for reporting — the owner will be able to see this was found.", warn: false };
+    }
+  }
+
+  
+  statusButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      for (var i = 0; i < statusButtons.length; i++) {
+        statusButtons[i].setAttribute("aria-pressed", "false");
+      }
+      btn.setAttribute("aria-pressed", "true");
+      selectedStatus = btn.dataset.status;
+    });
+  });
+
+  
+  function validate(data){
+    var valid = true;
+    var checks = [
+      { errId: "err-name",     test: data.name.trim().length > 0 },
+      { errId: "err-email",    test: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) },
+      { errId: "err-desc",     test: data.desc.trim().length > 0 },
+      { errId: "err-location", test: data.location.trim().length > 0 },
+      { errId: "err-date",     test: data.date.trim().length > 0 }
+    ];
+
+    for (var i = 0; i < checks.length; i++) {
+      var errEl = document.getElementById(checks[i].errId);
+      if (!checks[i].test) {
+        errEl.style.display = "block";
+        valid = false;
+      } else {
+        errEl.style.display = "none";
+      }
+    }
+    return valid;
+  }
+
+  
+  function recordToSheet(data){
+    return fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(data)
+    });
+  }
+
+  
+  function render(){
+    reportList.innerHTML = "";
+
+    var visible = reports.filter(function(r){
+      if (activeFilter === "All") return true;
+      return r.status === activeFilter;
+    });
+
+    emptyState.style.display = visible.length === 0 ? "block" : "none";
+
+    for (var i = 0; i < visible.length; i++) {
+      var r = visible[i];
+
+      var li = document.createElement("li");
+      li.className = "report";
+      li.dataset.id = r.id;
+      li.setAttribute("data-status", r.status);
+
+      var tag = document.createElement("span");
+      tag.className = "status-tag";
+      tag.textContent = r.status;
+
+      var body = document.createElement("div");
+      body.className = "report-body";
+
+      var title = document.createElement("div");
+      title.className = "report-title";
+      title.textContent = r.type + " — " + r.desc;
+
+      var meta = document.createElement("div");
+      meta.className = "report-meta";
+      meta.textContent = r.location + " · " + r.date + " · reported by " + r.name;
+
+      body.appendChild(title);
+      body.appendChild(meta);
+
+      var removeBtn = document.createElement("button");
+      removeBtn.className = "remove-btn";
+      removeBtn.type = "button";
+      removeBtn.setAttribute("aria-label", "Remove report");
+      removeBtn.textContent = "✕";
+
+      li.appendChild(tag);
+      li.appendChild(body);
+      li.appendChild(removeBtn);
+
+      reportList.appendChild(li);
+    }
+
+    updateStats();
+  }
+
+  function updateStats(){
+    var total = reports.length;
+    var lostCount = 0;
+    var foundCount = 0;
+
+    for (var i = 0; i < reports.length; i++) {
+      
+      switch (reports[i].status) {
+        case "Lost":
+          lostCount++;
+          break;
+        case "Found":
+          foundCount++;
+          break;
+        default:
+          break;
+      }
+    }
+
+    document.getElementById("stat-total").textContent = total;
+    document.getElementById("stat-lost").textContent = lostCount;
+    document.getElementById("stat-found").textContent = foundCount;
+
+    console.log(statPills.length + " stat pills currently rendered");
+  }
+
+  
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+
+    var data = {
+      status: selectedStatus,
+      name: document.getElementById("reporter-name").value,
+      email: document.getElementById("reporter-email").value,
+      type: document.getElementById("item-type").value,
+      desc: document.getElementById("item-desc").value,
+      location: document.getElementById("item-location").value,
+      date: document.getElementById("item-date").value
+    };
+
+    if (!validate(data)) {
+      showToast("Check the highlighted fields.", true);
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting…";
+
+    recordToSheet(data)
+      .then(function(){ showToast("Report recorded to the sheet.", false); })
+      .catch(function(){ showToast("Saved locally — sheet sync failed.", true); })
+      .finally(function(){
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit report";
+      });
+
+    reports.unshift({
+      id: generateId(),
+      status: data.status,
+      name: data.name,
+      email: data.email,
+      type: data.type,
+      desc: data.desc,
+      location: data.location,
+      date: data.date
+    });
+
+    var tip = buildAdvice(data.status, data.type);
+    adviceBox.textContent = tip.text;
+    adviceBox.className = "advice show" + (tip.warn ? " warn" : "");
+
+    form.reset();
+    statusButtons.forEach(function(b){
+      b.setAttribute("aria-pressed", b.dataset.status === "Lost" ? "true" : "false");
+    });
+    selectedStatus = "Lost";
+
+    render();
+  });
+
+  
+  reportList.addEventListener("click", function(e){
+    var removeBtn = e.target.closest(".remove-btn");
+    if (!removeBtn) return;
+    var row = e.target.closest(".report");
+    var id = Number(row.dataset.id);
+    reports = reports.filter(function(r){ return r.id !== id; });
+    render();
+  });
+
+  
+  filterButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      filterButtons.forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+      btn.setAttribute("aria-pressed", "true");
+      activeFilter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  
+  document.getElementById("item-date").value = new Date().toISOString().split("T")[0];
+
+  render();
+
+})();
+</script>
+
+</body>
+</html>
